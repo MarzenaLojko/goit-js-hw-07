@@ -505,36 +505,41 @@ function hmrAcceptRun(bundle, id) {
 },{}],"6XVkV":[function(require,module,exports) {
 var _galleryItemsJs = require("./gallery-items.js");
 // Change code below this line
-//2.Implementacja delegowania na div.gallery i otrzymanie url większego obrazu.
-const galleryPictures = document.querySelector("div.gallery");
-const newGalery = (0, _galleryItemsJs.galleryItems).map(({ preview , original , description  })=>`<div class="gallery__item">
-            <a class="gallery__link" href="${original}">
-                <img 
-                    class="gallery__image" 
-                    src="${preview}" 
-                    data-source="${original}"
-                    alt="${description}" 
-                    />
-            </a>
-        </div>`).join("");
-galleryPictures.insertAdjacentHTML("afterbegin", newGalery);
-//console.log(galleryItems);
-//4.Otworzenie okna modalnego po kliknięciu w element galerii. Aby to zrobić, zapoznaj się z dokumentacją i przykładami.
-//5.Zmiana wartości atrybutu src elementu <img> w oknie modalnym przed otworzeniem. 
-//Użyj gotowego znacznika okna modalnego z obrazem z przykładów biblioteki basicLightbox.
-const onClickPicture = (event)=>{
-    event.preventDefault();
-    if (event.target.nodeName !== `IMG`) return;
-    const instance = basicLightbox.create(`
-        <img src="${event.target.dataset.source}" width="800" height="600">
-    `);
+const gallery = document.querySelector(".gallery");
+const showOriginalSize = (event1, imageSrc)=>{
+    event1.preventDefault();
+    const instance = window.basicLightbox.create(`
+    <div class="modal">
+        <img src=${imageSrc} />
+    </div>
+`);
     instance.show();
-    const modalEscape = (e)=>{
-        if (e.code === "Escape") instance.close();
-    };
-    window.addEventListener("keydown", modalEscape);
+    document.addEventListener("keydown", (event)=>{
+        const key = event.key;
+        if (basicLightbox.visible() && key === "Escape") {
+            instance.close();
+            console.log("closed");
+        }
+    });
 };
-galleryPictures.addEventListener("click", onClickPicture);
+(0, _galleryItemsJs.galleryItems).forEach((item, index)=>{
+    gallery.insertAdjacentHTML("beforeend", `<div class="gallery__item"> 
+  <a class="gallery__link" href=${item.original}> 
+    <img 
+      class="gallery__image" 
+      src=${item.preview} 
+      data-source=${item.original}
+      alt=${item.description}
+    /> 
+  </a> 
+</div> 
+`);
+    const galleryLink = document.querySelector(`body > div.gallery > div:nth-child(${index + 1}) > a`);
+    galleryLink.addEventListener("click", (event)=>{
+        showOriginalSize(event, item.original);
+    });
+});
+console.log((0, _galleryItemsJs.galleryItems));
 
 },{"./gallery-items.js":"9C7dK"}],"9C7dK":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
