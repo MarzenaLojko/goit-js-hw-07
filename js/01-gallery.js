@@ -11,13 +11,16 @@ const showOriginalSize = (event, imageSrc) => {
     </div>
 `);
   instance.show();
-  document.addEventListener('keydown', (event) => {
+  const f = (event) => {
     const key = event.key;
     if (basicLightbox.visible() && key === 'Escape') {
       instance.close();
       console.log('closed');
+      document.removeEventListener('keydown', f);
     }
-  });
+  };
+  document.addEventListener('keydown', f);
+  document.removeEventListener('click', clickEventFunction);
 };
 
 galleryItems.forEach((item, index) => {
@@ -35,12 +38,12 @@ galleryItems.forEach((item, index) => {
 </div> 
 `
   );
-  const galleryLink = document.querySelector(
-    `body > div.gallery > div:nth-child(${index + 1}) > a`
-  );
-  galleryLink.addEventListener('click', (event) => {
+  const galleryLink = document.querySelector(`a`);
+  const clickEventFunction = (event) => {
     showOriginalSize(event, item.original);
-  });
+  };
+
+  galleryLink.addEventListener('click', clickEventFunction);
 });
 
 console.log(galleryItems);
